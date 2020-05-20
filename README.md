@@ -1,7 +1,7 @@
 # Programme de réduction du risque phoneGap & Cordova.
-Lecture tag NFC
-Lecture Empreinte digitale
-Envoi de SMS
+- Lecture tag NFC \( plugin [phonegap-nfc](https://www.npmjs.com/package/phonegap-nfc)\)
+- Lecture Empreinte digitale \(plugin [cordova-plugin-fingerprint-aio-criterion](https://www.npmjs.com/package/cordova-plugin-fingerprint-aio-criterion)\)
+- Envoi de SMS \(plugin [cordova-sms-plugin](https://www.npmjs.com/package/cordova-sms-plugin)\)
 
 Pour l'installation, saisissez :
  ```
