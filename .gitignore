@@ -1,3 +1,5 @@
 /node_modules/
 /plugins/
 /platforms/
+/www/spec/
+/www/spec.html
