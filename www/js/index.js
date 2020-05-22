@@ -41,14 +41,16 @@ var app = {
 	{
         console.log('Received Event: ' + id);
 	},
-	
-	sendSms: function() {
+	/*** Gestion SMS ****************/
+	sendSms: function() //envoi d'un sms
+	{
         var number = document.getElementById('numberTxt').value.toString(); /* iOS: ensure number is actually a string */
         var message = document.getElementById('messageTxt').value;
         console.log("number=" + number + ", message= " + message);
  
         //CONFIGURATION
-        var options = {
+        var options = 
+		{
             replaceLineBreaks: false, // true to replace \n by a new line, false by default
             android: {
                //intent: 'INTENT'  // send SMS with the native android SMS messaging
@@ -57,60 +59,99 @@ var app = {
         };
  
         var success = function () { alert('Message sent successfully'); };
-        var error = function (e) { 
-		navigator.notification.beep(1);
-					navigator.vibrate(1000);
-					navigator.notification.alert(
-    'Erreur lors de l\'envoi !',  // message
-    function(){},         // callback
-    'Erreur',            // title
-    'Ok'                  // buttonName
-);
-		
-		alert('Message Failed:' + e); };
+        var error = function (e) 
+		{ 
+			navigator.notification.beep(1);
+			navigator.vibrate(1000);
+			navigator.notification.alert(
+											'Erreur lors de l\'envoi !',  // message
+											function(){},         // callback
+											'Erreur',            // title
+											'Ok'                  // buttonName
+											);
+		};
         sms.send(number, message, options, success, error);
     },
-    requestSMSPermission: function() {
-        var success = function (hasPermission) { 
-            if (!hasPermission) {
-                sms.requestPermission(function() {
-                    console.log('[OK] Permission acceptée')
-                }, function(error) {
-					navigator.notification.beep(1);
-					navigator.vibrate(1000);
-					navigator.notification.alert(
-    'Permission refusée !',  // message
-    function(){},         // callback
-    'Erreur',            // title
-    'Ok'                  // buttonName
-);
-                    console.info('[WARN] Permission refusée')
-                    // Handle permission not accepted
-                })
+	requestSMSPermission: function() //demande d'autorisation de l'envoi du sms ou affichage de l'autorisation
+	{
+        var success = function (hasPermission) 
+		{ 
+            if (!hasPermission) 
+			{
+                sms.requestPermission(function() 
+					{
+						console.log('[OK] Permission acceptée')
+					}
+					, function(error) 
+					{
+						navigator.notification.beep(1);
+						navigator.vibrate(1000);
+						navigator.notification.alert('Permission refusée !', function(){},'Erreur','Ok');
+						console.info('[WARN] Permission refusée')
+						// Handle permission not accepted
+					})
             }
 			else
 			{
-				 alert("[OK] Permission autorisée.");
+				navigator.notification.alert('Permission déjà autorisée !', function(){},'Remarque','Ok');
 			}
         };
-        var error = function (e) { alert('Something went wrong:' + e); };
+        var error = function (e) 
+		{
+			navigator.notification.alert('Il y un problème !'+e, function(){},'Erreur','Ok');
+		};
         sms.hasPermission(success, error);
     },
-	
-	initNfc: function()
+	/*** Gestion NFC ****************/
+	enable: function()
 	{
-		nfc.addTagDiscoveredListener(
-                onNfc,
-                function() {
-                    alert("fonction addTagDiscoveredListener \n pret à lire...");
-                },
-				function() {
-                    alert("Pas de NFC");
-                }
-            );
-
-
+//		
+        nfc.enabled(function() //enable ok
+                                {
+                                    navigator.notification.alert('NFC activé.', function(){},'Remarque','Ok');
+                                   
+                               }
+                               ,function() //enable fail
+                                {
+                                   alert("Veuilez activer le NFC sur la fenêtre suivante");
+                                   nfc.showSettings(function()
+                                                {
+                                                //success enable nfc
+                                                 console.log("Ouverture fenetre activation réussié");
+                                                },
+                                                function() //enable fail
+                                                {
+                                                  navigator.notification.alert('Erreur lors de l\'ouverture de la fenêtre de propriété.', function(){},'Erreur','Ok');
+                                               });
+                               });
 	},
+        initNfc: function()
+	{
+           nfc.addTagDiscoveredListener(
+					
+					app.onNfc,// méthode appelée lors du scan
+					function() // listener success
+					{
+						$("#btNfc").html("NFC Activé");
+						//$("#btNfc").prop('disabled', true);
+						$("#mess").html("Passez le téléphone sur le tag NFC - RFID");
+						
+					},
+					function() // listener error
+					{
+					    alert("Pas de NFC activé!");
+					}
+                                ); 
+        },
+	 onNfc:function (nfcEvent) 
+	 { 
+				
+		var tag = nfcEvent.tag;
+		$('#texte2').empty();
+		$('#texte2').append("Tag numéro de série : " );
+		$('#texte2').append( nfc.bytesToHexString(tag.id));		     
+	},
+	/*** Gestion authentification par empreinte ****************/
 		activeFingerAuth: function()
 		{
 			// emprunte digitale
@@ -134,24 +175,8 @@ var app = {
 			  console.log(message);
 			});
 		}
+		
 };
 	
 
- function onNfc(nfcEvent) { 
-				//	alert("fct onNFC");
-					var tag = nfcEvent.tag;
-					$('#texte2').empty();
-					$('#texte2').append("Tag id : " +"<br>");
-					 
-					var ch=JSON.stringify(nfcEvent.tag);
-					var word = ch.split(',');
-					$('#texte2').append( '<br>'+word[0]);
-					$('#texte2').append( ','+word[1]);
-					$('#texte2').append( ','+word[2]);
-					$('#texte2').append( ','+word[3]+'<br>');
-				
-			
-				
-				alert(JSON.stringify(nfcEvent.tag));
-		     
-			}
+
