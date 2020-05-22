@@ -9,9 +9,11 @@ Pour l'installation, saisissez :
  2. cordova build android
 ```
 ### ATTENTION 
- 3.  Allez dans le fichier platforms\android\app\src\main\AndroidManifest.xml 
- et rajoutez  ```<uses-permission android:name="android.permission.SEND_SMS" />```
- 
+Pour l'envoi de SMS, deux modes sont disponibles 
+   - intent: 'INTENT'  *envoi d'un sms avec l'application native de sms*
+   - intent: '' *envoi un SMS avec notre code sans ouvrir d'autre application de sms*
+       - Dans cette deuxième situation, il faut  aller dans le fichier **platforms\android\app\src\main\AndroidManifest.xml** 
+       - et rajouter  **\<uses-permission android:name="android.permission.SEND_SMS" />**
  ```
- 4. cordova run android
+ 3. cordova run android
 ```
